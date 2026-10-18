@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>Waypoint</title>
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="preload" href="/static/fonts/atkinson-hyperlegible-next-latin-800-normal.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="/static/style.css">
+  <script src="/static/app.js" defer></script>
+</head>
+<body>
+  <main class="board" data-state="loading">
+    <header class="route">
+      <span class="badge" id="line">C2</span>
+      <h1 class="route-name"><span id="stop">La Close</span> <span class="arrow" aria-hidden="true">vers</span> <span id="destination">Gare Sud</span></h1>
+      <time class="clock" id="clock"></time>
+    </header>
+
+    <section class="hero" aria-live="polite">
+      <p class="verdict" id="verdict">Chargement des horaires</p>
+      <p class="countdown" id="countdown"><span class="num" id="num"></span><span class="unit" id="unit"></span></p>
+      <dl class="trip" id="trip">
+        <div><dt>Bus</dt><dd id="bus-time">–</dd></div>
+        <div><dt id="arrival-label">Arrivée</dt><dd id="arrival-time">–</dd></div>
+      </dl>
+    </section>
+
+    <section class="ribbon" aria-hidden="true">
+      <div class="track" id="track"></div>
+    </section>
+
+    <section class="later">
+      <h2>Ensuite</h2>
+      <ol id="later"></ol>
+    </section>
+
+    <footer class="status" id="status"></footer>
+  </main>
+</body>
+</html>

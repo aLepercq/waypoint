@@ -1,0 +1,43 @@
+# Checks on every push: lint, format, types, tests.
+#
+# Actions are pinned by commit hash (a tag can be moved by whoever controls the
+# action's repo); the comment gives the version. Named runner rather than
+# ubuntu-latest: no environment change behind our back. `uv sync --frozen`
+# applies uv.lock as is, so CI tests exactly the versions of the dev machine.
+name: ci
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  checks:
+    runs-on: ubuntu-24.04
+    env:
+      UV_VERSION: "0.12.5"
+
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: ${{ env.UV_VERSION }}
+
+      - name: Dependencies
+        run: uv sync --frozen
+
+      - name: Lint
+        run: uv run ruff check .
+
+      - name: Format
+        run: uv run ruff format --check .
+
+      - name: Types
+        run: uv run mypy
+
+      - name: Tests
+        run: uv run pytest

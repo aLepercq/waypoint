@@ -1,0 +1,214 @@
+@font-face {
+  font-family: "Atkinson Next";
+  src: url("fonts/atkinson-hyperlegible-next-latin-400-normal.woff2") format("woff2");
+  font-weight: 400;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Next";
+  src: url("fonts/atkinson-hyperlegible-next-latin-700-normal.woff2") format("woff2");
+  font-weight: 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Atkinson Next";
+  src: url("fonts/atkinson-hyperlegible-next-latin-800-normal.woff2") format("woff2");
+  font-weight: 800;
+  font-display: swap;
+}
+
+/* Night-sky slate for a living room at any hour; the line's own orange is the
+   only accent, used for the badge and for "leave now". */
+:root {
+  --bg: #19202c;
+  --surface: #222b3a;
+  --text: #eef2f6;
+  --muted: #8d99ab;
+  --rule: #344055;
+  --line: #ee7402;
+  --line-ink: #ffffff;
+  --urgent: #ff9a3c;
+  --font: "Atkinson Next", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #eef1f5;
+    --surface: #ffffff;
+    --text: #18202b;
+    --muted: #5a6577;
+    --rule: #cfd6e0;
+    --urgent: #c25400;
+  }
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+
+.board {
+  min-height: 100%;
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: clamp(1rem, 3vw, 2.5rem) clamp(1rem, 4vw, 3rem);
+  display: grid;
+  grid-template-rows: auto 1fr auto auto auto;
+  gap: clamp(1rem, 3vh, 2rem);
+}
+
+/* --- Route plate ------------------------------------------------------------ */
+.route {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+}
+.badge {
+  flex: none;
+  min-width: 3.2rem;
+  padding: 0.35rem 0.6rem;
+  border-radius: 0.6rem;
+  background: var(--line);
+  color: var(--line-ink);
+  font-weight: 800;
+  font-size: 1.6rem;
+  line-height: 1;
+  text-align: center;
+}
+.route-name {
+  margin: 0;
+  font-size: clamp(1.25rem, 2.6vw, 1.9rem);
+  font-weight: 700;
+  line-height: 1.2;
+}
+.arrow { color: var(--muted); font-weight: 400; }
+.clock {
+  margin-left: auto;
+  color: var(--muted);
+  font-size: clamp(1.1rem, 2.2vw, 1.6rem);
+}
+
+/* --- The answer ------------------------------------------------------------- */
+.hero { align-self: center; }
+.verdict {
+  margin: 0;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 700;
+}
+.countdown {
+  margin: 0;
+  line-height: 0.85;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+.num { font-size: clamp(7rem, 26vw, 19rem); }
+.unit {
+  font-size: clamp(2rem, 6vw, 4.5rem);
+  margin-left: 0.15em;
+  letter-spacing: 0;
+}
+.board[data-state="now"] .verdict,
+.board[data-state="now"] .countdown,
+.board[data-state="hurry"] .verdict,
+.board[data-state="hurry"] .countdown { color: var(--urgent); }
+
+.trip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 3rem;
+  margin: clamp(1rem, 3vh, 2rem) 0 0;
+  font-size: clamp(1.1rem, 2.4vw, 1.7rem);
+}
+.trip div { display: flex; flex-direction: column; gap: 0.15rem; }
+.trip dt { color: var(--muted); font-size: 0.7em; }
+.trip dd { margin: 0; font-weight: 700; }
+.trip .delay { color: var(--muted); font-weight: 400; margin-left: 0.4em; }
+.board[data-state="none"] .trip,
+.board[data-state="loading"] .trip { visibility: hidden; }
+
+/* --- Next 40 minutes: when to be out of the door, and the buses ---------------
+   The tinted band is the walk to the stop for the bus shown above. */
+.ribbon { padding-top: 1.6rem; }
+.track {
+  position: relative;
+  height: 2.6rem;
+  border-top: 2px solid var(--rule);
+}
+.track .tick,
+.track .bus,
+.track .walk { position: absolute; top: -2px; }
+.track .tick {
+  height: 0.5rem;
+  border-left: 2px solid var(--rule);
+}
+.track .tick span {
+  position: absolute;
+  top: 0.7rem;
+  transform: translateX(-50%);
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+.track .walk {
+  height: 2px;
+  background: var(--line);
+}
+.track .bus {
+  width: 1rem;
+  height: 1rem;
+  margin: -0.5rem 0 0 -0.5rem;
+  top: 0;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 3px solid var(--muted);
+}
+.track .bus.next { border-color: var(--line); background: var(--line); }
+.track .bus span {
+  position: absolute;
+  bottom: 1.2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* --- Following buses ------------------------------------------------------- */
+.later h2 {
+  margin: 0 0 0.6rem;
+  color: var(--muted);
+  font-size: 1rem;
+  font-weight: 700;
+}
+.later ol {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(13rem, 1fr));
+  gap: 0.75rem;
+}
+.later li {
+  padding: 0.8rem 1rem;
+  border-radius: 0.6rem;
+  background: var(--surface);
+  font-size: 1.15rem;
+}
+.later li strong { display: block; font-size: 1.6rem; }
+.later li small { display: block; color: var(--muted); font-size: 0.9rem; margin-top: 0.2rem; }
+.later li.missed { opacity: 0.45; }
+.later .empty { background: none; padding: 0; color: var(--muted); }
+
+.status {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+.status.warn { color: var(--urgent); }
+
+@media (max-width: 34rem) {
+  .route { flex-wrap: wrap; }
+  .clock { margin-left: 0; width: 100%; }
+}

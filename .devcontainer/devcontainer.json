@@ -1,0 +1,89 @@
+// ============================================================
+//  Template devcontainer -- Python
+//  A copier dans <projet>/.devcontainer/devcontainer.json
+//
+//  PORTABILITE : voir le template node. Aucune dependance
+//  a Docker Desktop, doit tourner sur le Docker nu du NAS.
+// ============================================================
+{
+  // Claude instructions managed by chezmoi on the host (read-only)
+  "mounts": [
+    "source=claude-config-${devcontainerId},target=/home/vscode/.claude,type=volume",
+    "source=${localEnv:HOME}/.claude/CLAUDE.md,target=/home/vscode/.claude/CLAUDE.md,type=bind,readonly",
+    "source=${localEnv:HOME}/.claude/lepercloud.md,target=/home/vscode/.claude/lepercloud.md,type=bind,readonly"
+  ],
+    "name": "waypoint",
+    // Couche locale : neutralise le depot apt Yarn casse de l'image de
+    // base. Voir le Dockerfile a cote. La version de Python se change
+    // en modifiant l'ARG BASE de ce Dockerfile.
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+
+    // Nom du conteneur Docker : "<dossier>-dev" au lieu d'un nom aleatoire
+    // (laughing_kare...). Le suffixe -dev evite toute collision avec un
+    // conteneur de deploiement qui porterait le nom du projet.
+    // Consequence d'un nom fixe : un seul conteneur par projet a la fois.
+    "runArgs": ["--name", "${localWorkspaceFolderBasename}-dev"],
+
+    "features": {
+        // zsh est DEJA dans l'image ; on ne garde cette feature que pour
+        // en faire le shell par defaut. installOhMyZsh reste a false :
+        // le prompt vient de Starship, via les dotfiles.
+        "ghcr.io/devcontainers/features/common-utils:2": {
+            "installZsh": true,
+            "configureZshAsDefaultShell": true,
+            "installOhMyZsh": false,
+            "upgradePackages": false
+        }
+        // Feature git retiree : l'image fournit deja git 2.50.1, plus
+        // recent que ce que le depot Debian propose. L'option ppa est
+        // par ailleurs sans effet hors Ubuntu.
+    },
+
+    // Le projet est monte depuis l'hote : tout ce qui y est ecrit est
+    // partage. Un virtualenv ne SUPPORTE pas ce partage -- il contient des
+    // chemins et des liens vers un interpreteur precis. Cree dans le
+    // conteneur puis vu depuis WSL (ou l'inverse), uv le detecte invalide
+    // et le reconstruit, chacun ecrasant celui de l'autre indefiniment.
+    // On sort donc l'environnement du montage : il vit dans le conteneur.
+    "containerEnv": {
+        "UV_PROJECT_ENVIRONMENT": "/home/vscode/.venv"
+    },
+
+    // 8503: waypoint board (8501 Ruinrate, 8502 Extia Stats).
+    "forwardPorts": [
+        8503
+    ],
+    "portsAttributes": {
+        "8503": {
+            "label": "waypoint",
+            "onAutoForward": "notify"
+        }
+    },
+
+    // Installe uv puis synchronise les dependances. La logique est dans un
+    // script a cote : elle distingue uv.lock (sync --frozen, versions
+    // verrouillees), pyproject.toml seul, et requirements.txt.
+    "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "ms-python.python",
+                "ms-python.vscode-pylance",
+                "charliermarsh.ruff",
+                "usernamehw.errorlens"
+            ],
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "python.defaultInterpreterPath": "/home/vscode/.venv/bin/python",
+                "[python]": {
+                    "editor.defaultFormatter": "charliermarsh.ruff"
+                }
+            }
+        }
+    },
+
+    "remoteUser": "vscode"
+}

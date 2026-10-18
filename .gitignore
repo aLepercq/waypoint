@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+.env
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+
+# Personal Claude Code permissions
+.claude/settings.local.json

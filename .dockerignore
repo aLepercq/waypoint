@@ -1,0 +1,20 @@
+# Never in the image.
+
+# Secrets: the optional API key reaches the container at runtime (env_file).
+.env
+.env.*
+!.env.example
+
+# Not needed at runtime.
+.git/
+.github/
+.devcontainer/
+.venv/
+deploy/
+docs/
+tests/
+**/__pycache__/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+*.log

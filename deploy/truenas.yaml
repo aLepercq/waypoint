@@ -1,0 +1,26 @@
+# Waypoint as a TrueNAS "Custom App" (Apps -> Discover Apps -> ⋮ -> Install via YAML).
+#
+# Paste as is. No ${…} variables: the UI reads no .env next to the YAML.
+# Nothing to persist (GTFS re-downloaded at start, then daily), so no data
+# dataset. The optional API key lives in /mnt/leperserver/waypoint/.env
+# (chmod 600); remove the env_file block if that file does not exist.
+#
+# Update: Installed -> waypoint -> Edit, change the version in `image:`, Save.
+# Rollback: put the previous version back.
+services:
+  web:
+    image: ghcr.io/alepercq/waypoint:0.1.0
+    restart: unless-stopped
+    user: "568:568"
+    env_file:
+      - path: /mnt/leperserver/waypoint/.env
+        required: false
+    # Target of the VPS nginx (http://100.75.61.44:8503, over Tailscale).
+    ports:
+      - "8503:8503"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    # Bounds the GTFS parse (~500 MB of CSV, streamed).
+    mem_limit: 512m

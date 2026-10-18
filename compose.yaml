@@ -1,0 +1,25 @@
+# Waypoint in Docker, locally.
+#
+#   docker compose up -d --build     # build and start
+#   docker compose logs -f           # GTFS load, SIRI errors
+#   docker compose down
+#
+# Nothing to persist: the GTFS is downloaded at start and refreshed daily.
+name: waypoint
+
+services:
+  web:
+    build: .
+    image: waypoint:local
+    restart: unless-stopped
+    # Optional: WAYPOINT_API_KEY lifts the public plan's rate limit.
+    env_file:
+      - path: .env
+        required: false
+    # Loopback only: not visible from the network.
+    ports:
+      - "127.0.0.1:8503:8503"
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
